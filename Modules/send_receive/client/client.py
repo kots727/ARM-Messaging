@@ -8,6 +8,7 @@ import zmq
 import cv2
 import numpy as np
 import json
+import base64
 context = zmq.Context()
 
 #  Socket to talk to server
@@ -35,11 +36,12 @@ while True:
 
     #  Get the reply.
     message = socket.recv()
+    
     m_dict = json.loads(message)
-    buff = np.array(m_dict["img"])
+    img_data = base64.b64decode(m_dict['img'])
+    np_img = np.frombuffer(img_data, dtype=np.uint8)    
     print(f" pos_0 = {m_dict["joint_0_pos"]}, pos_1 = {m_dict["joint_1_pos"]}, pos_2 = {m_dict["joint_2_pos"]} ")
-    buff = buff.reshape(1, -1)
-    img = cv2.imdecode(buff, cv2.IMREAD_COLOR)
+    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
     cv2.imshow("client",img)
     exit_key_press = cv2.waitKey(1)
 
