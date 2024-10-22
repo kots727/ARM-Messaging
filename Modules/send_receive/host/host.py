@@ -20,7 +20,6 @@ while True:
     while not ret:
         print("failed to read")
         ret, frame = cap.read()
-    cv2.imshow('frame',frame)
     res, im_string =cv2.imencode(".jpg",frame)
     image_base64 = base64.b64encode(im_string).decode('utf-8')
     #  Wait for next request from client
@@ -43,10 +42,3 @@ while True:
     }
     m2s= json.dumps(host_payload)
     socket.send_string(m2s)
-    exit_key_press = cv2.waitKey(1)
-
-    if exit_key_press == ord("q"):
-        break
-cap.release()
-cv2.waitKey(0)
-cv2.destroyAllWindows()
