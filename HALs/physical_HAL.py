@@ -94,7 +94,7 @@ class physical_HAL(HAL_base):
         
         with self.camera_lock:
             frame = self.picam2.capture_array()
-        hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
         # cv2.imshow("Camera", hsv)
         # cv2.waitKey(1)
         return hsv

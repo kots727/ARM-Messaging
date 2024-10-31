@@ -15,8 +15,7 @@ import asyncio
 class remote_HAL(HAL_base):
     def __init__(self):
         super().__init__()
-        self.execute = False
-        self.set_joint = [0,0,0]
+        self.set_joint = [[0,False],[0,False],[0,False]]
         self.img = 0
         self.get_joint = [0,0,0]
 
@@ -44,13 +43,20 @@ class remote_HAL(HAL_base):
             return hsv_image
         else: 
             return "no image"
-    def start_asnyc(self):
+        
+    def set_joint(self, joint_index, joint_angle):
+        self.set_joint[joint_index] = [joint_angle, True]
+        pass
+    def get_joint(self, joint_index):
+        return self.get_joint[joint_index]
+    def joint_count(self):
+        return 3
+    async def start_asnyc(self):
         while self.keep_running:
             print(f"Sending request …")
           
 
             client_payload = {
-                "execute" : self.execute,
                 "set_joint_0" : self.set_joint[0],
                 "set_joint_1" : self.set_joint[1],
                 "set_joint_2" : self.set_joint[2],
@@ -59,7 +65,7 @@ class remote_HAL(HAL_base):
             m2s = json.dumps(client_payload)
 
             self.socket.send_string(m2s)
-            self.execute = False
+            self.set_joint = [[0,False],[0,False],[0,False]]
             #  Get the reply.
             message = self.socket.recv()
             

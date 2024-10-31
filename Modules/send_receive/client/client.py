@@ -23,7 +23,6 @@ while True:
     set_joint_0 = .30
     set_joint_1 = .30
     set_joint_2 = .30
-
     client_payload = {
         "recall" : recall,
         "set_joint_0" : set_joint_0,
@@ -43,4 +42,12 @@ while True:
     np_img = np.frombuffer(img_data, dtype=np.uint8)    
     print(f" pos_0 = {m_dict["joint_0_pos"]}, pos_1 = {m_dict["joint_1_pos"]}, pos_2 = {m_dict["joint_2_pos"]} ")
     img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+    cv2.imshow("client",img)
+    exit_key_press = cv2.waitKey(1)
+
+    if exit_key_press == ord("q"):
+        break
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
 

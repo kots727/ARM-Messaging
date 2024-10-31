@@ -25,6 +25,7 @@ config = {
     "use_simulator" : True,
     "use_physical" : False,
     "use_app" : False,
+    "as_host": True,
     "use_server" : True,
     "use_twitch" : False,
     "open_startup_page" : False,
@@ -112,7 +113,7 @@ upper_red = np.array([40, 255, 255])
 selected_object_identifier: VisualObjectIdentifier = ColorObjectIdentifier(lower_blue, upper_blue)
 
 # controler stuff
-selected_controler: Controller = FollowLargestObjectControler(selected_HAL, selected_object_identifier)
+selected_controler: Controller = None
 
 selected_app = None
 if config["use_app"]:
@@ -137,6 +138,12 @@ if config["use_twitch"]:
         print("Please set twitch_secret to a valid twitch secret to use the twitch chat reader")
     else:
         selected_twitch = TwitchChat(config["twitch_id"], config["twitch_secret"])
+
+#Relay setup
+if config["as_host"]:
+    from Modules.send_receive.host.ArmRelay import ArmRelay
+    selected_relay = ArmRelay(selected_HAL)
+
 
 print('              Selected HAL: ' + selected_HAL.__class__.__name__)
 print('Selected object_identifier: ' + selected_object_identifier.__class__.__name__)
@@ -171,6 +178,10 @@ if __name__ == "__main__":
     if config["use_server"]:
         print("Server Startup")
         selected_server.start_server()
+    
+    if config["as_host"]:
+        print("Relay Started")
+        selected_relay.start_connection()
 
     if config["use_app"]:
         try:
