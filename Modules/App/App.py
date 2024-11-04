@@ -128,6 +128,7 @@ class Test(TabbedPanel):
                 self.controller.start()
                 self.controller_start=True
             img = cv2.resize(self.hal.get_arm_cam_img_hsv(), (0,0), fx=0.25, fy=0.25) 
+            img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
             w, h, _ = img.shape
             texture = Texture.create(size=(h, w))
             texture2 = Texture.create(size=(h, w))

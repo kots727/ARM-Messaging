@@ -28,11 +28,12 @@ class ArmRelay(RelayBase):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind("tcp://*:5555")
-        self.cap = cv2.VideoCapture(0)
 
     def start_connection(self):
         self.keep_running = True
+
         self.thread = threading.Thread(target=self.thread_main)
+        self.thread.start()
         return True
 
     # return False
@@ -42,16 +43,28 @@ class ArmRelay(RelayBase):
         return True
     # return False
     def thread_main(self):
+        print("x")
         asyncio.run(self.start_async())
-    async def start_asnyc(self):
+
+    
+    async def start_async(self):
         while self.keep_running:    
+            print("testss")
             frame = cv2.cvtColor(self.selected_HAL.capture_image(),cv2.COLOR_HSV2RGB)
-            cv2.imshow('frame',frame)
             res, im_string =cv2.imencode(".jpg",frame)
             image_base64 = base64.b64encode(im_string).decode('utf-8')
             #  Wait for next request from client
+            print("primed to receive request")
             message = self.socket.recv() 
             print(f"Received request: {message}")
+            m_dict = json.loads(message)
+            set_joint_l = [0,0,0]
+            set_joint_l[0] = m_dict["set_joint_0"]
+            set_joint_l[1] = m_dict["set_joint_1"]
+            set_joint_l[2] = m_dict["set_joint_2"]
+            for x in range(3):
+                if set_joint_l[x][1]:
+                    self.selected_HAL.set_joint(x,set_joint_l[x][0])
 
             #  Do some 'work'
 
