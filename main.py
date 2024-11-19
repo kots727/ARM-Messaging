@@ -179,7 +179,7 @@ if __name__ == "__main__":
         print("Server Startup")
         selected_server.start_server()
     
-    if config["as_host"]:
+    if config["as_host"] and not config["use_server"] and not config["use_app"]:
         print("Relay Started")
         selected_relay.start_connection()
 

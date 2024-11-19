@@ -14,6 +14,7 @@ import threading
 import asyncio
 
 from Controllers import FollowClaw
+from nicegui import ui
 from Modules.send_receive.host.RelayBase import RelayBase
 from Controllers.Controller import Controller
 from Controllers.FollowClaw import coordinate_input
@@ -28,6 +29,12 @@ class ArmRelay(RelayBase):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.REP)
         self.socket.bind("tcp://*:5555")
+        self.connections ={}
+        self.connection_names=[]
+
+        self.toggle2 = ui.toggle(self.connections, value=0)
+        
+        ui.run()
 
     def start_connection(self):
         self.keep_running = True
@@ -62,9 +69,20 @@ class ArmRelay(RelayBase):
             set_joint_l[0] = m_dict["set_joint_0"]
             set_joint_l[1] = m_dict["set_joint_1"]
             set_joint_l[2] = m_dict["set_joint_2"]
-            for x in range(3):
-                if set_joint_l[x][1]:
-                    self.selected_HAL.set_joint(x,set_joint_l[x][0])
+            connection_id = m_dict["id"]
+            if self.connections.__len__()>0:
+                if connection_id == self.connections[self.toggle2.value]:
+                    for x in range(3):
+                        if set_joint_l[x][1]:
+                            self.selected_HAL.set_joint(x,set_joint_l[x][0])
+            else:
+                for x in range(3):
+                    if set_joint_l[x][1]:
+                        self.selected_HAL.set_joint(x,set_joint_l[x][0])
+            if connection_id not in self.connections.values():
+                self.connections[connection_id] = self.connections.__len__()-1
+                self.connection_names.append(connection_id)
+            
 
             #  Do some 'work'
 

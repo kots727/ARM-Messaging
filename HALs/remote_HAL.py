@@ -10,12 +10,15 @@ import cv2
 import numpy as np
 import json
 import threading
+import socket
 import base64
+
 import asyncio
 class remote_HAL(HAL_base):
     def __init__(self):
         super().__init__()
         self.set_joint_val = [[0,False],[0,False],[0,False]]
+        self.read_from = 0
         self.img = np.zeros((256, 256, 3), dtype=np.uint8)
         self.joint_val = [0,0,0]
 
@@ -25,6 +28,7 @@ class remote_HAL(HAL_base):
         #  Socket to talk to server
         print("Connecting to hello world server…")
         self.socket = self.context.socket(zmq.REQ)
+        self.socket_identity = socket.gethostname()
         self.socket.connect("tcp://localhost:5555")
         self.keep_running = True
         self.thread = threading.Thread(target=self.thread_main)
@@ -57,7 +61,7 @@ class remote_HAL(HAL_base):
                 "set_joint_0" : self.set_joint_val[0],
                 "set_joint_1" : self.set_joint_val[1],
                 "set_joint_2" : self.set_joint_val[2],
-                
+                "id": self.socket_identity
             }
             m2s = json.dumps(client_payload)
 
